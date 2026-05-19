@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>黃修陽 Sunny｜從需求挖掘到系統落地</title>
+  <style>
+    :root {
+      --bg: #f7fbff;
+      --bg-2: #eef6ff;
+      --card: rgba(255, 255, 255, 0.78);
+      --card-strong: rgba(255, 255, 255, 0.92);
+      --line: rgba(58, 96, 135, 0.16);
+      --text: #132238;
+      --muted: #5c6f86;
+      --gold: #f59e0b;
+      --cyan: #14b8a6;
+      --blue: #2563eb;
+      --pink: #d946ef;
+      --shadow: 0 22px 70px rgba(45, 83, 124, 0.14);
+      --radius: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(20, 184, 166, 0.18), transparent 28%),
+        radial-gradient(circle at 80% 15%, rgba(37, 99, 235, 0.14), transparent 32%),
+        radial-gradient(circle at 50% 85%, rgba(217, 70, 239, 0.10), transparent 34%),
+        linear-gradient(180deg, #fbfdff 0%, #eef7ff 45%, #f8fbff 100%);
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      height: 4px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--gold), var(--pink));
+      box-shadow: 0 0 20px rgba(94, 234, 212, 0.5);
+    }
+
+    .nav {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 16px 40px rgba(45, 83, 124, 0.12);
+    }
+
+    .nav a {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      transition: 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+    }
+
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: grid;
+      place-items: center;
+      padding: 140px 24px 80px;
+      isolation: isolate;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -2;
+      background:
+        linear-gradient(120deg, rgba(245, 158, 11, 0.14), transparent 35%),
+        radial-gradient(circle at 50% 45%, rgba(37, 99, 235, 0.09), transparent 22%);
+    }
+
+    .orbit {
+      position: absolute;
+      width: 62vw;
+      max-width: 780px;
+      aspect-ratio: 1;
+      border: 1px solid rgba(37, 99, 235, 0.14);
+      border-radius: 50%;
+      animation: spin 26s linear infinite;
+      z-index: -1;
+    }
+
+    .orbit::before,
+    .orbit::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 28px var(--cyan);
+    }
+
+    .orbit::before {
+      top: 12%;
+      left: 16%;
+    }
+
+    .orbit::after {
+      right: 8%;
+      bottom: 22%;
+      background: var(--gold);
+      box-shadow: 0 0 28px var(--gold);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-inner {
+      width: min(1120px, 100%);
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      color: var(--cyan);
+      background: rgba(94, 234, 212, 0.10);
+      border: 1px solid rgba(94, 234, 212, 0.22);
+      border-radius: 999px;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 16px var(--cyan);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(44px, 7vw, 92px);
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--blue), var(--cyan), var(--gold));
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      margin: 28px 0 0;
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.8;
+      color: var(--muted);
+      max-width: 760px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 13px 18px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.68);
+      transition: 0.28s ease;
+    }
+
+    .btn.primary {
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--blue), var(--cyan));
+      border-color: transparent;
+      font-weight: 800;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.25);
+    }
+
+    .profile-card {
+      position: relative;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(150deg, rgba(255, 255, 255, 0.95), rgba(241, 248, 255, 0.72)),
+        rgba(255, 255, 255, 0.74);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(22px);
+      overflow: hidden;
+    }
+
+    .profile-card::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -80px;
+      top: -80px;
+      background: radial-gradient(circle, rgba(20, 184, 166, 0.22), transparent 66%);
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+      display: grid;
+      place-items: center;
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--gold), var(--cyan));
+      color: #ffffff;
+      font-size: 44px;
+      font-weight: 900;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 54px rgba(94, 234, 212, 0.18);
+    }
+
+    .profile-card h2 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .profile-card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .badge {
+      padding: 14px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.82);
+    }
+
+    .badge strong {
+      display: block;
+      color: var(--gold);
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    section {
+      position: relative;
+      padding: 110px 24px;
+    }
+
+    .wrap {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+
+    .section-heading {
+      margin-bottom: 42px;
+    }
+
+    .chapter {
+      color: var(--gold);
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 13px;
+    }
+
+    h2 {
+      margin: 12px 0 0;
+      font-size: clamp(32px, 4.8vw, 58px);
+      line-height: 1.06;
+      letter-spacing: -0.04em;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.8;
+      max-width: 760px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(42px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .reveal.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid.cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card {
+      position: relative;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--card);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 16px 46px rgba(45, 83, 124, 0.10);
+      overflow: hidden;
+      min-height: 190px;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: auto 20px 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: 0;
+      transition: 0.35s ease;
+    }
+
+    .card:hover::after {
+      opacity: 1;
+    }
+
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 24px;
+    }
+
+    .card p,
+    .card li {
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 16px;
+    }
+
+    .card ul {
+      padding-left: 1.2em;
+      margin: 0;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 24px;
+      align-items: stretch;
+      margin-top: 20px;
+    }
+
+    .kpi {
+      display: grid;
+      place-items: center;
+      min-height: 300px;
+      text-align: center;
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 50% 35%, rgba(245, 158, 11, 0.18), transparent 42%),
+        rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(255, 209, 102, 0.25);
+      box-shadow: var(--shadow);
+    }
+
+    .kpi .number {
+      font-size: clamp(76px, 12vw, 150px);
+      font-weight: 900;
+      letter-spacing: -0.08em;
+      color: var(--gold);
+      line-height: 0.9;
+    }
+
+    .kpi span {
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .timeline {
+      position: relative;
+      margin-top: 30px;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--cyan), var(--gold), var(--pink));
+    }
+
+    .step {
+      position: relative;
+      padding: 0 0 30px 26px;
+    }
+
+    .step::before {
+      content: "";
+      position: absolute;
+      left: -26px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 22px rgba(255, 209, 102, 0.45);
+    }
+
+    .step h3 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .step p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .sticky-story {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .sticky-panel {
+      position: sticky;
+      top: 110px;
+      min-height: 410px;
+      padding: 30px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(20, 184, 166, 0.16), transparent 38%),
+        rgba(255, 255, 255, 0.82);
+      box-shadow: var(--shadow);
+    }
+
+    .sticky-panel .label {
+      color: var(--cyan);
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      font-size: 13px;
+    }
+
+    .sticky-panel h3 {
+      font-size: 40px;
+      line-height: 1.1;
+      margin: 20px 0;
+    }
+
+    .story-block {
+      min-height: 260px;
+      margin-bottom: 20px;
+      padding: 28px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+    }
+
+    .story-block h3 {
+      margin: 0 0 12px;
+      font-size: 26px;
+    }
+
+    .story-block p {
+      color: var(--muted);
+      line-height: 1.85;
+      margin: 0;
+    }
+
+    .marquee {
+      display: flex;
+      overflow: hidden;
+      border-block: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.56);
+      transform: rotate(-1deg);
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 30px;
+      padding: 20px 0;
+      animation: marquee 24s linear infinite;
+      white-space: nowrap;
+    }
+
+    .marquee span {
+      color: rgba(19, 34, 56, 0.70);
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .final {
+      min-height: 86vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+
+    .final-box {
+      width: min(920px, 100%);
+      padding: clamp(32px, 7vw, 78px);
+      border-radius: 42px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.16), transparent 28%),
+        radial-gradient(circle at 80% 60%, rgba(20, 184, 166, 0.16), transparent 34%),
+        rgba(255, 255, 255, 0.88);
+      box-shadow: var(--shadow);
+    }
+
+    .final h2 {
+      font-size: clamp(42px, 7vw, 86px);
+    }
+
+    .footer {
+      color: rgba(19,34,56,0.52);
+      text-align: center;
+      padding: 28px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .nav {
+        max-width: calc(100vw - 20px);
+        overflow-x: auto;
+        justify-content: flex-start;
+      }
+
+      .hero-inner,
+      .kpi-row,
+      .sticky-story,
+      .grid.cols-2,
+      .grid.cols-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .sticky-panel {
+        position: relative;
+        top: auto;
+      }
+
+      section {
+        padding: 80px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+
+  <nav class="nav" aria-label="頁面導覽">
+    <a href="#hero" class="active">首頁</a>
+    <a href="#profile">概覽</a>
+    <a href="#projects">實績</a>
+    <a href="#pm">PM</a>
+    <a href="#presales">Pre-sales</a>
+    <a href="#future">價值</a>
+  </nav>
+
+  <main>
+    <header class="hero" id="hero">
+      <div class="orbit"></div>
+      <div class="hero-inner">
+        <div class="reveal show">
+          <div class="eyebrow">Self Introduction / Work Story</div>
+          <h1>從需求挖掘<br><span class="gradient-text">到系統落地</span></h1>
+          <p class="lead">
+            我是黃修陽 Sunny。我的工作核心，是把製造現場的模糊需求、跨部門資訊斷點與管理痛點，
+            轉譯成可被開發、可被導入、也可被現場真正使用的企業系統。
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#profile">開始瀏覽</a>
+            <a class="btn" href="https://sunny-projects-status.vercel.app/" target="_blank" rel="noopener noreferrer">查看專案實績</a>
+          </div>
+        </div>
+
+        <aside class="profile-card reveal show">
+          <div class="avatar">S</div>
+          <h2>Sunny Huang</h2>
+          <p>PMP 認證｜製造業相關系統規劃｜跨文化整合力</p>
+          <div class="badge-grid">
+            <div class="badge"><strong>PMP</strong>國際專案管理師</div>
+            <div class="badge"><strong>900</strong>TOEIC 跨國溝通</div>
+            <div class="badge"><strong>MES</strong>製造系統導入</div>
+            <div class="badge"><strong>Pre-sales</strong>顧問式提案</div>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <section id="profile">
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div class="chapter">Chapter 01</div>
+          <h2>跨領域的專業積累</h2>
+          <p class="sub">
+            以國貿、專案管理與製造系統導入經驗為底，把商業語言、現場語言與系統語言連在一起。
+          </p>
+        </div>
+        <div class="grid cols-3">
+          <article class="card reveal">
+            <h3>學歷背景</h3>
+            <p>政大國貿碩士，並曾至里昂商學院交換，培養商業分析與跨文化溝通能力。</p>
+          </article>
+          <article class="card reveal">
+            <h3>專案方法</h3>
+            <p>具 PMP 國際專案管理認證，擅長以交付節點、風險管理與溝通節奏推進專案。</p>
+          </article>
+          <article class="card reveal">
+            <h3>文化適應</h3>
+            <p>來自大陸、來台 13 年，長期在不同文化與產業場景中學習、調適與整合。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>需求訪談</span><span>流程規劃</span><span>規格書撰寫</span><span>API 欄位對應</span><span>MES 導入</span><span>IoT 整合</span><span>教育訓練</span><span>驗收交付</span>
+        <span>需求訪談</span><span>流程規劃</span><span>規格書撰寫</span><span>API 欄位對應</span><span>MES 導入</span><span>IoT 整合</span><span>教育訓練</span><span>驗收交付</span>
+      </div>
+    </div>
+
+    <section id="projects">
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div class="chapter">Chapter 02</div>
+          <h2>從製造現場到數位轉型</h2>
+          <p class="sub">
+            核心經驗聚焦於 MES 與製造相關系統：串接 ERP、整合現場報工邏輯、導入 IoT 即時資料，並協助使用者建立新的數位操作習慣。
+          </p>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi reveal">
+            <div>
+              <div class="number" data-count="18">0</div>
+              <span>負責中客戶數</span>
+            </div>
+          </div>
+
+          <div class="grid cols-2">
+            <article class="card reveal">
+              <h3>ERP 基礎資料串接</h3>
+              <p>串接庫存、BOM 等基礎資料，讓生產現場與後端管理資料保持一致。</p>
+            </article>
+            <article class="card reveal">
+              <h3>生產與進出料邏輯</h3>
+              <p>整合報工、領退料、WIP 與成品流程，使作業節點可被追蹤與管理。</p>
+            </article>
+            <article class="card reveal">
+              <h3>IoT 即時監控</h3>
+              <p>導入設備資料整合，讓稼動、產出與異常資訊能即時呈現在系統中。</p>
+            </article>
+            <article class="card reveal">
+              <h3>現場使用習慣轉換</h3>
+              <p>協助現場人員從紙本或口頭作業，轉向可追溯、可查核的數位流程。</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pm">
+      <div class="wrap sticky-story">
+        <aside class="sticky-panel reveal">
+          <div class="label">PM Capability</div>
+          <h3>把模糊需求變成可交付成果</h3>
+          <p class="sub">
+            以訪談、原型、規格、時程與驗收節點，把專案從簽約後一路推進到保固交接。
+          </p>
+        </aside>
+
+        <div>
+          <div class="story-block reveal">
+            <h3>01｜流程規劃</h3>
+            <p>使用 Axure / AI 等工具繪製互動原型，將使用者語言精準轉譯為系統規格與操作流程。</p>
+          </div>
+          <div class="story-block reveal">
+            <h3>02｜規格書撰寫</h3>
+            <p>在無 SA 與 UI/UX 的情況下，獨立整理需求、欄位、API 對應與作業規則，形成正式規格文件。</p>
+          </div>
+          <div class="story-block reveal">
+            <h3>03｜時程管控</h3>
+            <p>透過甘特圖與 Jira、Asana 等工具追蹤開發、測試、教育訓練與驗收節點。</p>
+          </div>
+          <div class="story-block reveal">
+            <h3>04｜交接與保固</h3>
+            <p>專案進入保固後，負責將專案知識與維運要點轉移給 MA 團隊，確保服務不中斷。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div class="chapter">Delivery Framework</div>
+          <h2>跨越專案全生命週期</h2>
+        </div>
+
+        <div class="timeline">
+          <div class="step reveal">
+            <h3>需求規格定義 Translation</h3>
+            <p>簽約後依訪談內容，產出包含 API 串接欄位對應的正式規格書。</p>
+          </div>
+          <div class="step reveal">
+            <h3>時程與進度管控 Timeline</h3>
+            <p>制定甘特圖，明確啟動、開發、測試、教育訓練與驗收等交付節點。</p>
+          </div>
+          <div class="step reveal">
+            <h3>QA 與驗收交付 Acceptance</h3>
+            <p>確認程式經 QA 測試、教育訓練後可順利驗收，降低導入落差。</p>
+          </div>
+          <div class="step reveal">
+            <h3>專案交接 Handover</h3>
+            <p>保固階段將專案背景、規格邏輯與常見問題移轉給維運團隊。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="presales">
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div class="chapter">Chapter 03</div>
+          <h2>Pre-sales：從痛點到提案</h2>
+          <p class="sub">
+            在售前階段先理解客戶現況與瓶頸，將粗略需求轉化為初步方案、畫面、流程圖與估價基礎。
+          </p>
+        </div>
+
+        <div class="grid cols-3">
+          <article class="card reveal">
+            <h3>客戶拜訪與訪談</h3>
+            <p>確認客戶痛點、既有作業方式與對系統的期待，先建立問題共識。</p>
+          </article>
+          <article class="card reveal">
+            <h3>系統初步規劃</h3>
+            <p>製作初版畫面、提案簡報與流程圖，讓方案更具體、可討論。</p>
+          </article>
+          <article class="card reveal">
+            <h3>協助報價</h3>
+            <p>根據初步規劃粗估開發 Loading，協助估價、報價與範圍界定。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div class="chapter">Manufacturing Pain Points</div>
+          <h2>將資訊孤島轉變為數據中心</h2>
+        </div>
+
+        <div class="grid cols-2">
+          <article class="card reveal">
+            <h3>實時數據採集報工</h3>
+            <p>利用 PDA、IoT 技術實現「數據不落地」，降低帳料不符與人工補登問題。</p>
+          </article>
+          <article class="card reveal">
+            <h3>全製程可追溯性</h3>
+            <p>從原料、在製品到成品賦予唯一身分證號，使每個批號、流程與異常都能追蹤。</p>
+          </article>
+          <article class="card reveal">
+            <h3>強制性流程卡控</h3>
+            <p>在系統中內化 FIFO、PQC 等最佳實踐，減少人為疏失與流程繞行。</p>
+          </article>
+          <article class="card reveal">
+            <h3>智慧化決策支援</h3>
+            <p>自動生成 OEE、稼動率與生產進度看板，讓管理者能以數據判斷現場狀態。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="future">
+      <div class="wrap">
+        <div class="section-heading reveal">
+          <div class="chapter">Chapter 04</div>
+          <h2>未來價值：顧問式變革力</h2>
+          <p class="sub">
+            非資工背景不只是限制，也是一種優勢：更能從使用者語言、商業場景與現場流程出發，推動可落地的數位轉型。
+          </p>
+        </div>
+
+        <div class="grid cols-3">
+          <article class="card reveal">
+            <h3>高感性翻譯力</h3>
+            <p>懂工廠語言，也能翻譯為嚴謹規格書，降低客戶與工程團隊之間的理解落差。</p>
+          </article>
+          <article class="card reveal">
+            <h3>顧問式變革思維</h3>
+            <p>面對模糊需求，能洞察各行各業痛點，協助組織重新設計流程。</p>
+          </article>
+          <article class="card reveal">
+            <h3>數據化執行力</h3>
+            <p>用數據佐證 Pre-sales 提案，也用甘特圖與節點管理嚴謹控管交付品質。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="final">
+      <div class="final-box reveal">
+        <div class="chapter">Thanks for your attention</div>
+        <h2>讓系統真正被現場使用</h2>
+        <p class="sub" style="margin-inline:auto;">
+          我相信好的系統規劃，不只是把需求寫完，而是讓需求、流程、資料與使用者習慣能一起落地。
+        </p>
+        <div class="hero-actions" style="justify-content:center;">
+          <a class="btn primary" href="#hero">回到開頭</a>
+          <a class="btn" href="https://sunny-projects-status.vercel.app/" target="_blank" rel="noopener noreferrer">查看專案實績</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Sunny Huang｜Self Introduction Scroll Website Demo
+  </footer>
+
+  <script>
+    const progress = document.getElementById("progress");
+    const revealEls = document.querySelectorAll(".reveal");
+    const navLinks = document.querySelectorAll(".nav a");
+    const sections = [...document.querySelectorAll("header[id], section[id]")];
+
+    function updateProgress() {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const ratio = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progress.style.width = ratio + "%";
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("show");
+
+          const number = entry.target.querySelector?.("[data-count]");
+          if (number && !number.dataset.done) {
+            number.dataset.done = "true";
+            const target = Number(number.dataset.count);
+            let current = 0;
+            const step = Math.max(1, Math.ceil(target / 36));
+            const timer = setInterval(() => {
+              current += step;
+              if (current >= target) {
+                number.textContent = target + "+";
+                clearInterval(timer);
+              } else {
+                number.textContent = current;
+              }
+            }, 28);
+          }
+        }
+      });
+    }, { threshold: 0.16 });
+
+    revealEls.forEach((el) => revealObserver.observe(el));
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.getAttribute("id");
+        navLinks.forEach((link) => {
+          link.classList.toggle("active", link.getAttribute("href") === "#" + id);
+        });
+      });
+    }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+
+    sections.forEach((section) => sectionObserver.observe(section));
+
+    window.addEventListener("scroll", () => {
+      updateProgress();
+
+      const scrollY = window.scrollY;
+      document.querySelectorAll(".orbit").forEach((el) => {
+        el.style.transform = `rotate(${scrollY * 0.035}deg)`;
+      });
+    }, { passive: true });
+
+    updateProgress();
+  </script>
+</body>
+</html>
